@@ -1,8 +1,9 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 from mptt.admin import DraggableMPTTAdmin
 
-from .models import Shop, Product, Category
+from .models import Shop, Product, Category, Image
 
 
 class ProductInline(admin.TabularInline):
@@ -10,28 +11,29 @@ class ProductInline(admin.TabularInline):
     extra = 1
 
 
+class PhotoAdmin(admin.StackedInline):
+    model = Image
+    extra = 0
+    min_num = 1
+
+
 class CategoryAdmin(DraggableMPTTAdmin):
-    list_display = ('tree_actions', 'indented_title',)
-    list_display_links = ('indented_title',)
     search_fields = ('title', 'id', 'parent__title')
-    # prepopulated_fields = {'slug': ('title',)}
 
 
 class ShopAdmin(admin.ModelAdmin):
-    list_display = ('title', 'description', 'image_url')
+    list_display = ('title', 'description')
     search_fields = ('title',)
-    inlines = [ProductInline]
 
 
 class ProductAdmin(admin.ModelAdmin, DynamicArrayMixin):
-    exclude = ('id',)
-    # list_display = ('title', 'description', 'price', 'active', 'main_image')
+    list_display = ('id', 'title', 'main_image', 'amount', 'price', 'active')
     search_fields = ('title', 'id')
-
-    # list_filter = ('active', 'price')
+    inlines = (PhotoAdmin,)
 
     def main_image(self, obj):
-        return '<img src="{}" height="50" />'.format(obj.image)
+        return mark_safe(
+            f'<a href="http://localhost:8000/admin/app/product/{obj.id}/change/"><img src="{obj.product_images.first().image_url}" height="50" /></a>')
 
     main_image.allow_tags = True
     main_image.short_description = 'Main Image'
