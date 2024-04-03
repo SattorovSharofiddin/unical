@@ -42,10 +42,13 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     active = models.BooleanField(default=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='products')
-    categories = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+    categories = models.ManyToManyField(Category, related_name='products')
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        ordering = ['price', 'amount']
 
 
 class CustomUser(AbstractUser):

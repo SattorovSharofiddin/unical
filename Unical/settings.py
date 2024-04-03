@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'app',
     'mptt',
     'django_better_admin_arrayfield',
+    'admin_numeric_filter',
 
 ]
 
